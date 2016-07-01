@@ -35,6 +35,7 @@ import javax.websocket.DeploymentException;
 import javax.websocket.server.ServerEndpointConfig;
 import org.eclipse.jetty.util.component.AbstractLifeCycle;
 import org.eclipse.jetty.util.component.LifeCycle;
+import org.eclipse.jetty.websocket.jsr356.server.BasicServerEndpointConfig;
 import org.eclipse.jetty.websocket.jsr356.server.ServerContainer;
 import org.eclipse.jetty.websocket.jsr356.server.ServerEndpointMetadata;
 import org.slf4j.Logger;
@@ -88,6 +89,8 @@ public class WebsocketBundle implements Bundle {
                     ServerContainer wsContainer = InstWebSocketServerContainerInitializer.
                             configureContext(environment.getApplicationContext(), environment.metrics());
 
+                    wsContainer.start();
+
                     StringBuilder sb = new StringBuilder("Registering websocket endpoints: ")
                             .append(System.lineSeparator())
                             .append(System.lineSeparator());
@@ -97,12 +100,21 @@ public class WebsocketBundle implements Bundle {
                     LOG.info(sb.toString());
                 } catch (ServletException ex) {
                     throw new RuntimeException(ex);
-                }
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
+				}
             }
 
             private void addEndpoint(ServerContainer wsContainer, final Class<?> endpointClass, ServerEndpointConfig conf, StringBuilder sb) throws DeploymentException {
+            	if (conf != null) {
+            		BasicServerEndpointConfig basicConf = new BasicServerEndpointConfig(wsContainer, conf.getEndpointClass(), conf.getPath());
+            		basicConf.getUserProperties().putAll(conf.getUserProperties());
+            		wsContainer.addEndpoint(basicConf);
+            	}
+            	else {
+            		wsContainer.addEndpoint(endpointClass);
+            	}
                 ServerEndpointMetadata md = wsContainer.getServerEndpointMetadata(endpointClass, conf);
-                wsContainer.addEndpoint(md);
                 sb.append(String.format("    WS      %s (%s)", md.getPath(), endpointClass.getName())).append(System.lineSeparator());
             }
         });

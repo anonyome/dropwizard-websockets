@@ -22,19 +22,11 @@
  */
 package io.dropwizard.websockets;
 
-import com.codahale.metrics.annotation.ExceptionMetered;
-import com.codahale.metrics.annotation.Metered;
-import com.codahale.metrics.annotation.Timed;
-import com.codahale.metrics.health.HealthCheck;
-import io.dropwizard.Application;
-import io.dropwizard.Configuration;
-import io.dropwizard.setup.Bootstrap;
-import io.dropwizard.setup.Environment;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
-import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
+
 import javax.servlet.ServletException;
 import javax.websocket.CloseReason;
 import javax.websocket.DeploymentException;
@@ -51,9 +43,20 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+
 import org.eclipse.jetty.util.component.AbstractLifeCycle;
 import org.eclipse.jetty.util.component.LifeCycle;
 import org.eclipse.jetty.websocket.jsr356.server.BasicServerEndpointConfig;
+
+import com.codahale.metrics.annotation.ExceptionMetered;
+import com.codahale.metrics.annotation.Metered;
+import com.codahale.metrics.annotation.Timed;
+import com.codahale.metrics.health.HealthCheck;
+
+import io.dropwizard.Application;
+import io.dropwizard.Configuration;
+import io.dropwizard.setup.Bootstrap;
+import io.dropwizard.setup.Environment;
 
 public class MyApp extends Application<Configuration> {
     private final CountDownLatch cdl;
@@ -88,7 +91,7 @@ public class MyApp extends Application<Configuration> {
         });
 
         // Using BasicServerEndpointConfig lets you inject objects to the websocket endpoint:
-        final BasicServerEndpointConfig bsec = new BasicServerEndpointConfig(EchoServer.class, "/extends-ws");
+        final BasicServerEndpointConfig bsec = new BasicServerEndpointConfig(null, EchoServer.class, "/extends-ws");
         // bsec.getUserProperties().put(Environment.class.getName(), environment);
         // Then you can get it from the Session object
         // - obj = session.getUserProperties().get("objectName");            
