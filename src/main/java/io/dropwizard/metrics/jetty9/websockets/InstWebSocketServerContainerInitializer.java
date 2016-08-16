@@ -34,6 +34,7 @@ import org.eclipse.jetty.websocket.server.WebSocketUpgradeFilter;
 public class InstWebSocketServerContainerInitializer {
     public static ServerContainer configureContext(final MutableServletContextHandler context, final MetricRegistry metrics) throws ServletException {
         WebSocketUpgradeFilter filter = WebSocketUpgradeFilter.configureContext(context);
+        filter.getFactory().getExtensionFactory().unregister("permessage-deflate");
         ServerContainer wsContainer = new ServerContainer(filter, filter.getFactory(), context.getServer().getThreadPool());
         EventDriverFactory edf = filter.getFactory().getEventDriverFactory();
         edf.clearImplementations();
